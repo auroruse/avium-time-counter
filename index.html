@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Avium Time Counter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/neue-montreal" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f0c;
+      --panel: #0f1310;
+      --border: #1a221a;
+      --border-hover: #2a3a2a;
+      --accent: #3d5343;
+      --accent-light: #627661;
+      --text: #c5c8c6;
+      --text-bright: #d3ebd3;
+      --text-dim: #4c5a4c;
+      --text-muted: #6b7a6b;
+      --text-input: #dde5dd;
+      --red: #bf616a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-y: scroll; }
+
+    body {
+      font-family: 'Neue Montreal', 'Inter', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    ::selection { background: #3d534366; color: var(--text-bright); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 28px 0 0;
+      margin-bottom: 40px;
+    }
+
+    .header-bar {
+      width: 3px;
+      height: 28px;
+      background: linear-gradient(180deg, var(--text-bright) 0%, var(--accent) 100%);
+      border-radius: 2px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-bright);
+    }
+
+    /* ═══ NIXIE CLOCK ═══ */
+
+    .clock {
+      text-align: center;
+      margin-bottom: 56px;
+      width: 100%;
+      max-width: 580px;
+    }
+
+    .clock-housing {
+      background: linear-gradient(180deg, #12100e 0%, #0e0c0a 30%, #0a0908 100%);
+      border-radius: 16px;
+      padding: 8px;
+      border: 1px solid #2a241c;
+      box-shadow:
+        0 2px 0 #1a1612,
+        0 4px 0 #14110e,
+        0 16px 48px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .clock-face {
+      background: linear-gradient(170deg, #0a0908 0%, #080706 50%, #060504 100%);
+      border-radius: 10px;
+      padding: 36px 32px 32px;
+      position: relative;
+      box-shadow:
+        inset 0 2px 10px rgba(0, 0, 0, 0.6),
+        inset 0 0 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .clock-face::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 50% 55%, rgba(255, 150, 40, 0.02) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .clock-face::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
+      border-radius: 10px 10px 0 0;
+      pointer-events: none;
+    }
+
+    .clock-dow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: #7a5a2a;
+      text-shadow: 0 0 8px rgba(255, 150, 40, 0.08);
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .clock-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(2rem, 5.5vw, 3.2rem);
+      font-weight: 600;
+      color: #ffba5c;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+      text-shadow:
+        0 0 4px rgba(255, 186, 92, 0.9),
+        0 0 12px rgba(255, 160, 50, 0.5),
+        0 0 28px rgba(255, 140, 30, 0.25),
+        0 0 56px rgba(255, 120, 20, 0.1);
+    }
+
+    /* Individual nixie tubes */
+
+    .nixie-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tube {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: clamp(36px, 8vw, 48px);
+      height: clamp(56px, 12vw, 72px);
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 55%, rgba(255, 140, 30, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 50%, #0e0b08 0%, #080604 100%);
+      border: 1px solid rgba(80, 65, 40, 0.2);
+      border-top-color: rgba(100, 80, 50, 0.25);
+      border-bottom-color: rgba(40, 30, 18, 0.3);
+      border-radius: 10px 10px 6px 6px;
+      position: relative;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        inset 0 0 16px rgba(0, 0, 0, 0.4),
+        inset 0 -4px 12px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .tube::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 4px;
+      right: 4px;
+      height: 35%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, transparent 100%);
+      border-radius: 8px 8px 50% 50%;
+      pointer-events: none;
+    }
+
+    .tube::after {
+      content: "";
+      position: absolute;
+      bottom: 3px;
+      left: 30%;
+      right: 30%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(80, 60, 30, 0.15), transparent);
+      pointer-events: none;
+    }
+
+    .tube .digit {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 500;
+      color: #ffb040;
+      text-shadow:
+        0 0 3px rgba(255, 176, 64, 1),
+        0 0 8px rgba(255, 150, 40, 0.7),
+        0 0 18px rgba(255, 130, 20, 0.35),
+        0 0 36px rgba(255, 110, 10, 0.12);
+      position: relative;
+      z-index: 1;
+    }
+
+    .neon-sep {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 3vw, 16px);
+      width: clamp(12px, 3vw, 18px);
+      height: clamp(56px, 12vw, 72px);
+    }
+
+    .neon-sep i {
+      display: block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #e89020;
+      box-shadow:
+        0 0 3px rgba(232, 144, 32, 0.9),
+        0 0 8px rgba(255, 150, 40, 0.4),
+        0 0 14px rgba(255, 130, 20, 0.15);
+    }
+
+    /* Pin base decoration under tubes */
+
+    .tube-base {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tube-base .pin {
+      width: clamp(36px, 8vw, 48px);
+      height: 3px;
+      background: linear-gradient(180deg, #1a1510 0%, #0e0c08 100%);
+      border-radius: 0 0 3px 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .tube-base .pin-gap {
+      width: clamp(12px, 3vw, 18px);
+      height: 3px;
+    }
+
+    /* ═══ CALCULATOR ═══ */
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 32px;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      border: 1px solid var(--border-hover);
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      font-family: 'Neue Montreal', 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    .tab:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent-light);
+      color: #fff;
+      box-shadow: 0 0 12px #3d534344;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--text-input);
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px #3d534320;
+    }
+
+    .form-group input::-webkit-calendar-picker-indicator {
+      filter: invert(0.6) sepia(0.3) hue-rotate(80deg);
+    }
+
+    input[type=number] { -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .calc-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      font-family: 'Neue Montreal', 'Inter', sans-serif;
+      box-shadow: 0 2px 8px #3d534333;
+      transition: box-shadow 0.2s, transform 0.15s;
+      margin-top: 4px;
+    }
+
+    .calc-btn:hover { box-shadow: 0 4px 16px #3d534355; transform: translateY(-1px); }
+    .calc-btn:active { transform: translateY(0); box-shadow: 0 2px 8px #3d534333; }
+
+    .calc-result {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-bright);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      min-height: 42px;
+      letter-spacing: 0.02em;
+    }
+
+    .calc-result:empty { display: none; }
+    .calc-result.error { color: var(--red); border-color: #bf616a33; }
+    .hidden { display: none !important; }
+
+    /* ═══ EPOCH LOG ═══ */
+
+    .epoch-section { width: 100%; max-width: 480px; margin-bottom: 48px; }
+
+    .epoch-details summary {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-dim);
+      cursor: pointer; user-select: none; list-style: none;
+      display: flex; align-items: center; gap: 8px; transition: color 0.15s;
+    }
+
+    .epoch-details summary:hover { color: var(--text-bright); }
+    .epoch-details summary::-webkit-details-marker { display: none; }
+    .epoch-details summary::marker { content: ""; }
+    .epoch-details summary .arrow { display: inline-block; font-size: 8px; color: var(--text-dim); transition: transform 0.15s; }
+    .epoch-details[open] summary .arrow { transform: rotate(90deg); }
+
+    .epoch-table { width: 100%; margin-top: 12px; border-spacing: 0; }
+    .epoch-table thead th { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    .epoch-table tbody td { font-size: 12px; padding: 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .epoch-table tbody tr:last-child td { border-bottom: none; }
+    .epoch-table tbody tr:hover td { background: #141a14; }
+    .epoch-table .epoch-index { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 10px; width: 24px; }
+    .epoch-table .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 11px; }
+    .epoch-table .dim { color: var(--text-muted); }
+
+    .footer { padding: 24px 0 32px; font-size: 11px; color: var(--text-dim); text-align: center; }
+
+    @media (max-width: 520px) {
+      .panel, .epoch-section, .clock { max-width: calc(100% - 32px); }
+      .header { padding: 20px 16px 0; }
+      .tabs { flex-wrap: wrap; }
+      .clock-face { padding: 28px 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-bar"></div>
+    <h1>Avium Time Counter</h1>
+  </div>
+
+  <div class="clock">
+    <div class="clock-housing">
+      <div class="clock-face">
+        <div id="clock-dow" class="clock-dow">&mdash;</div>
+        <div id="clock-date" class="clock-date">&mdash;</div>
+        <div id="clock-time"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Time Calculator</div>
+    <div class="tabs">
+      <button id="tab-ooc-to-ic" class="tab active">OOC &rarr; IC</button>
+      <button id="tab-ic-to-ooc" class="tab">IC &rarr; OOC</button>
+    </div>
+    <div id="form-ooc-to-ic">
+      <div class="form-group"><label>OOC Date</label><input type="date" id="ooc-date"></div>
+      <div class="form-group"><label>OOC Time</label><input type="time" id="ooc-time" value="00:00"></div>
+      <div class="form-group"><label>Hours from GMT</label><input type="number" id="ooc-offset" value="0" step="0.5"></div>
+      <button class="calc-btn" id="btn-ooc-to-ic">Calculate</button>
+    </div>
+    <div id="form-ic-to-ooc" class="hidden">
+      <div class="form-group"><label>IC Date</label><input type="date" id="ic-date"></div>
+      <div class="form-group"><label>IC Time</label><input type="time" id="ic-time" value="00:00"></div>
+      <button class="calc-btn" id="btn-ic-to-ooc">Calculate</button>
+    </div>
+    <div id="calc-result" class="calc-result"></div>
+  </div>
+
+  <div class="epoch-section">
+    <details class="epoch-details">
+      <summary><span class="arrow">&#9654;</span> Epoch Log</summary>
+      <table class="epoch-table">
+        <thead><tr><th></th><th>OOC Start</th><th>IC Start</th><th>Rate</th><th>Mult</th><th>Note</th></tr></thead>
+        <tbody id="epoch-tbody"></tbody>
+      </table>
+    </details>
+  </div>
+
+  <div class="footer"></div>
+
+  <script>
+    var EPOCHS = [
+      {
+        oocStart:    "2026-06-28T00:00:00Z",
+        icStart:     "1931-06-01T00:00:00",
+        daysPerYear: 52,
+        label:       "Initial"
+      }
+    ];
+
+    var IC_TIMEZONE_OFFSET = 0;
+    var MEAN_YEAR_MS = 365.2425 * 86400000;
+    var DAY_MS = 86400000;
+
+    function getMultiplier(dpy) { return MEAN_YEAR_MS / (dpy * DAY_MS); }
+
+    function getActiveEpoch(oocTs) {
+      for (var i = EPOCHS.length - 1; i >= 0; i--) {
+        if (oocTs >= parseOOC(EPOCHS[i].oocStart)) return EPOCHS[i];
+      }
+      return EPOCHS[0];
+    }
+
+    function parseOOC(iso) { return new Date(iso).getTime(); }
+
+    function parseIC(iso) {
+      var p = iso.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+      if (!p) return NaN;
+      return Date.UTC(+p[1], +p[2] - 1, +p[3], +p[4], +p[5], +p[6]);
+    }
+
+    function oocToICMs(oocTs) {
+      var ep = getActiveEpoch(oocTs);
+      return parseIC(ep.icStart) + (oocTs - parseOOC(ep.oocStart)) * getMultiplier(ep.daysPerYear);
+    }
+
+    function oocToIC(oocTs) { return new Date(oocToICMs(oocTs)); }
+
+    function icToOOC(icTs) {
+      var idx = 0;
+      for (var i = 0; i < EPOCHS.length; i++) {
+        var s = parseIC(EPOCHS[i].icStart);
+        if (i < EPOCHS.length - 1) {
+          var ns = parseIC(EPOCHS[i + 1].icStart);
+          if (i > 0) {
+            var pe = EPOCHS[i - 1];
+            var end = parseIC(pe.icStart) + (parseOOC(EPOCHS[i].oocStart) - parseOOC(pe.oocStart)) * getMultiplier(pe.daysPerYear);
+            if (icTs > end && icTs < s) return { skipped: true, epochIndex: i };
+          }
+          if (icTs >= s && icTs < ns) { idx = i; break; }
+        } else { idx = i; }
+      }
+      var ep = EPOCHS[idx];
+      var elapsed = icTs - parseIC(ep.icStart);
+      return { skipped: false, oocDate: new Date(parseOOC(ep.oocStart) + elapsed / getMultiplier(ep.daysPerYear)), epochIndex: idx };
+    }
+
+    var IC_DAYS = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+    var IC_MONTHS = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+
+    function formatIC(d) {
+      var off = IC_TIMEZONE_OFFSET * 3600000;
+      var a = new Date(d.getTime() + off);
+      return {
+        dow: IC_DAYS[a.getUTCDay()], day: a.getUTCDate(), month: IC_MONTHS[a.getUTCMonth()], year: a.getUTCFullYear(),
+        h: String(a.getUTCHours()).padStart(2,"0"), m: String(a.getUTCMinutes()).padStart(2,"0"), s: String(a.getUTCSeconds()).padStart(2,"0")
+      };
+    }
+
+    function formatOOC(d) {
+      var dn = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      var mn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      return dn[d.getUTCDay()] + ", " + d.getUTCDate() + " " + mn[d.getUTCMonth()] + " " + d.getUTCFullYear() + " — " +
+        String(d.getUTCHours()).padStart(2,"0") + ":" + String(d.getUTCMinutes()).padStart(2,"0") + ":" + String(d.getUTCSeconds()).padStart(2,"0") + " UTC";
+    }
+
+    // NIXIE TUBE RENDERER
+
+    function buildTubes(h, m, s) {
+      var time = h + ":" + m + ":" + s;
+      var tubes = '<div class="nixie-row">';
+      var bases = '<div class="tube-base">';
+      for (var i = 0; i < time.length; i++) {
+        if (time[i] === ":") {
+          tubes += '<div class="neon-sep"><i></i><i></i></div>';
+          bases += '<div class="pin-gap"></div>';
+        } else {
+          tubes += '<div class="tube"><span class="digit">' + time[i] + '</span></div>';
+          bases += '<div class="pin"></div>';
+        }
+      }
+      tubes += '</div>';
+      bases += '</div>';
+      return tubes + bases;
+    }
+
+    // LIVE CLOCK — rAF loop polls at display refresh rate (60fps).
+    // Only touches the DOM when the IC second actually changes.
+    // setInterval fallback keeps it ticking in background tabs.
+
+    var lastSec = -1;
+
+    function tick() {
+      var icMsExact = oocToICMs(Date.now());
+      var icSec = Math.floor(icMsExact / 1000);
+      if (icSec !== lastSec) {
+        lastSec = icSec;
+        var ic = formatIC(new Date(icMsExact));
+        document.getElementById("clock-dow").textContent = ic.dow;
+        document.getElementById("clock-date").textContent = ic.day + " " + ic.month + " " + ic.year;
+        document.getElementById("clock-time").innerHTML = buildTubes(ic.h, ic.m, ic.s);
+      }
+    }
+
+    function clockLoop() { tick(); requestAnimationFrame(clockLoop); }
+
+    // CALCULATOR
+
+    var calcMode = "ooc-to-ic";
+    function setCalcMode(mode) {
+      calcMode = mode;
+      document.getElementById("tab-ooc-to-ic").classList.toggle("active", mode === "ooc-to-ic");
+      document.getElementById("tab-ic-to-ooc").classList.toggle("active", mode === "ic-to-ooc");
+      document.getElementById("form-ooc-to-ic").classList.toggle("hidden", mode !== "ooc-to-ic");
+      document.getElementById("form-ic-to-ooc").classList.toggle("hidden", mode !== "ic-to-ooc");
+      document.getElementById("calc-result").textContent = "";
+    }
+
+    function calcOtoI() {
+      var dv = document.getElementById("ooc-date").value;
+      var tv = document.getElementById("ooc-time").value || "00:00";
+      var off = parseFloat(document.getElementById("ooc-offset").value) || 0;
+      if (!dv) { showRes("Enter an OOC date.", true); return; }
+      var p = tv.split(":").map(Number);
+      var ooc = new Date(dv + "T00:00:00Z");
+      ooc.setUTCHours(p[0], p[1], 0, 0);
+      ooc.setTime(ooc.getTime() - off * 3600000);
+      var ic = formatIC(oocToIC(ooc.getTime()));
+      showRes(ic.dow + ", " + ic.day + " " + ic.month + " " + ic.year + " — " + ic.h + ":" + ic.m + ":" + ic.s);
+    }
+
+    function calcItoO() {
+      var dv = document.getElementById("ic-date").value;
+      var tv = document.getElementById("ic-time").value || "00:00";
+      if (!dv) { showRes("Enter an IC date.", true); return; }
+      var ts = parseIC(dv + "T" + tv + ":00");
+      if (ts < parseIC(EPOCHS[0].icStart)) { showRes("This IC date is before recorded time.", true); return; }
+      var r = icToOOC(ts);
+      if (r.skipped) { showRes("This IC date was skipped by a timeskip.", true); return; }
+      showRes(formatOOC(r.oocDate));
+    }
+
+    function showRes(t, err) {
+      var el = document.getElementById("calc-result");
+      el.textContent = t;
+      el.className = "calc-result" + (err ? " error" : "");
+    }
+
+    function renderEpochs() {
+      var tb = document.getElementById("epoch-tbody"); tb.innerHTML = "";
+      for (var i = 0; i < EPOCHS.length; i++) {
+        var e = EPOCHS[i], tr = document.createElement("tr");
+        var od = new Date(e.oocStart);
+        var os = od.getUTCDate() + " " + IC_MONTHS[od.getUTCMonth()].charAt(0) + IC_MONTHS[od.getUTCMonth()].slice(1).toLowerCase() + " " + od.getUTCFullYear();
+        var ip = e.icStart.match(/(\d{4})-(\d{2})-(\d{2})/);
+        var is_ = +ip[3] + " " + IC_MONTHS[+ip[2]-1].charAt(0) + IC_MONTHS[+ip[2]-1].slice(1).toLowerCase() + " " + ip[1];
+        tr.innerHTML = '<td class="epoch-index">'+(i+1)+'</td><td>'+os+'</td><td>'+is_+'</td><td class="mono">'+e.daysPerYear+' d/y</td><td class="mono dim">×'+(365.2425/e.daysPerYear).toFixed(2)+'</td><td class="dim">'+e.label+'</td>';
+        tb.appendChild(tr);
+      }
+    }
+
+    (function() {
+      function go() {
+        tick();
+        requestAnimationFrame(clockLoop);
+        setInterval(tick, 100);
+        setCalcMode("ooc-to-ic");
+        document.getElementById("tab-ooc-to-ic").onclick = function(){ setCalcMode("ooc-to-ic"); };
+        document.getElementById("tab-ic-to-ooc").onclick = function(){ setCalcMode("ic-to-ooc"); };
+        document.getElementById("btn-ooc-to-ic").onclick = calcOtoI;
+        document.getElementById("btn-ic-to-ooc").onclick = calcItoO;
+        renderEpochs();
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
+      else go();
+    })();
+  </script>
+</body>
+</html>
