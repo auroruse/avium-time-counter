@@ -1,8 +1,8 @@
 # Avium Time Counter
 
-Browser-based IC/OOC time converter built for the [Avium Cinematic Universe](https://github.com/auroruse/avium-football-engine) roleplay setting. Single-file vanilla app, zero dependencies.
+Browser-based IC/OOC time converter built for [Avium](https://www.nationstates.net/page=dispatch/id=1815726). Single-file vanilla app, zero dependencies.
 
-**[Live App](https://auroruse.github.io/avium-time-counter/)**
+**[Live App](https://auroruse.github.io/avium-time-counter/)** | **[Discord](https://discord.gg/zVhxZXFea4)**
 
 ## Features
 
@@ -20,10 +20,6 @@ Browser-based IC/OOC time converter built for the [Avium Cinematic Universe](htt
 - Code-editable `EPOCHS` array for timeskips and rate changes
 - Each epoch defines an OOC anchor, IC anchor, days-per-year rate, and label
 - Calculator and clock automatically resolve across all epochs
-
-## Usage
-
-Open `index.html` in a browser. No build step, no server, no dependencies.
 
 ## Deploy
 
