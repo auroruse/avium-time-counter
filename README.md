@@ -20,9 +20,3 @@ Browser-based IC/OOC time converter built for [Avium](https://www.nationstates.n
 - Code-editable `EPOCHS` array for timeskips and rate changes
 - Each epoch defines an OOC anchor, IC anchor, days-per-year rate, and label
 - Calculator and clock automatically resolve across all epochs
-
-## Deploy
-
-Push to `main` — GitHub Pages serves `index.html` directly.
-
-Repo Settings > Pages > Source > Deploy from a branch > `main` / `/ (root)`.
