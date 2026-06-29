@@ -84,7 +84,7 @@
         0 2px 0 #1a1612,
         0 4px 0 #14110e,
         0 16px 48px rgba(0, 0, 0, 0.6),
-        0 0 80px rgba(255, 140, 30, 0.015),
+        0 0 100px rgba(255, 140, 30, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
@@ -103,9 +103,9 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 50% 60%, rgba(255, 150, 40, 0.025) 0%, transparent 70%);
+      background: radial-gradient(ellipse 80% 50% at 50% 65%, rgba(255, 150, 40, 0.07) 0%, transparent 70%);
       pointer-events: none;
-      animation: ambientPulse 4s ease-in-out infinite;
+      animation: ambientPulse 3s ease-in-out infinite;
     }
 
     .clock-face::after {
@@ -113,14 +113,14 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 40%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 100%);
       border-radius: 10px 10px 0 0;
       pointer-events: none;
     }
 
     @keyframes ambientPulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
+      50% { opacity: 0.5; }
     }
 
     .clock-dow {
@@ -129,8 +129,8 @@
       font-weight: 400;
       letter-spacing: 0.5em;
       text-transform: uppercase;
-      color: #7a5a2a;
-      text-shadow: 0 0 10px rgba(255, 150, 40, 0.1);
+      color: #9a7a3a;
+      text-shadow: 0 0 12px rgba(255, 150, 40, 0.2);
       margin-bottom: 16px;
       position: relative;
       z-index: 1;
@@ -141,16 +141,17 @@
       font-variant-numeric: tabular-nums;
       font-size: clamp(2rem, 5.5vw, 3.2rem);
       font-weight: 600;
-      color: #ffba5c;
+      color: #ffc060;
       letter-spacing: 0.05em;
       margin-bottom: 24px;
       position: relative;
       z-index: 1;
       text-shadow:
-        0 0 4px rgba(255, 186, 92, 0.9),
-        0 0 12px rgba(255, 160, 50, 0.5),
-        0 0 28px rgba(255, 140, 30, 0.25),
-        0 0 56px rgba(255, 120, 20, 0.1);
+        0 0 4px rgba(255, 192, 96, 1),
+        0 0 15px rgba(255, 160, 50, 0.7),
+        0 0 35px rgba(255, 140, 30, 0.35),
+        0 0 70px rgba(255, 120, 20, 0.15),
+        0 0 120px rgba(255, 100, 10, 0.06);
     }
 
     /* Individual nixie tubes */
@@ -159,7 +160,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
       position: relative;
       z-index: 1;
     }
@@ -168,34 +169,38 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: clamp(36px, 8vw, 48px);
-      height: clamp(56px, 12vw, 72px);
+      width: clamp(40px, 9vw, 52px);
+      height: clamp(60px, 13vw, 76px);
       background:
-        radial-gradient(ellipse 80% 60% at 50% 55%, rgba(255, 140, 30, 0.05) 0%, transparent 60%),
-        radial-gradient(ellipse at 50% 50%, #0e0b08 0%, #080604 100%);
-      border: 1px solid rgba(80, 65, 40, 0.25);
-      border-top-color: rgba(100, 80, 50, 0.3);
-      border-bottom-color: rgba(40, 30, 18, 0.3);
-      border-radius: 10px 10px 6px 6px;
+        radial-gradient(ellipse 90% 70% at 50% 55%, rgba(255, 140, 30, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 50%, #100c08 0%, #080604 100%);
+      border: 1px solid rgba(100, 80, 50, 0.3);
+      border-top-color: rgba(120, 95, 60, 0.35);
+      border-bottom-color: rgba(50, 38, 22, 0.3);
+      border-radius: 12px 12px 6px 6px;
       position: relative;
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.04),
-        inset 0 0 20px rgba(0, 0, 0, 0.5),
-        inset 0 -4px 12px rgba(0, 0, 0, 0.2),
-        0 4px 8px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(255, 140, 30, 0.02);
-      animation: tubeFlicker 3s ease-in-out infinite;
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 24px rgba(0, 0, 0, 0.5),
+        inset 0 -4px 14px rgba(0, 0, 0, 0.2),
+        0 4px 10px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(255, 140, 30, 0.04),
+        0 0 60px rgba(255, 120, 20, 0.02);
+      animation: tubeFlicker 2s ease-in-out infinite;
       animation-delay: var(--flicker-delay, 0s);
     }
 
     @keyframes tubeFlicker {
-      0%, 100% { filter: brightness(1); }
-      15% { filter: brightness(0.97); }
-      30% { filter: brightness(1.01); }
-      45% { filter: brightness(0.98); }
-      60% { filter: brightness(1); }
-      75% { filter: brightness(0.99); }
-      88% { filter: brightness(1.02); }
+      0% { filter: brightness(1); }
+      8% { filter: brightness(0.92); }
+      12% { filter: brightness(1.04); }
+      20% { filter: brightness(0.96); }
+      35% { filter: brightness(1.02); }
+      50% { filter: brightness(0.94); }
+      65% { filter: brightness(1.03); }
+      78% { filter: brightness(0.97); }
+      90% { filter: brightness(1.01); }
+      100% { filter: brightness(1); }
     }
 
     .tube::before {
@@ -204,24 +209,24 @@
       top: 2px;
       left: 4px;
       right: 4px;
-      height: 35%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
-      border-radius: 8px 8px 50% 50%;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, transparent 100%);
+      border-radius: 10px 10px 50% 50%;
       pointer-events: none;
     }
 
     .tube::after {
       content: "";
       position: absolute;
-      bottom: 3px;
-      left: 30%;
-      right: 30%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(120, 90, 40, 0.2), transparent);
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 12px;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255, 140, 30, 0.1) 0%, transparent 70%);
       pointer-events: none;
     }
 
-    /* Ghost cathode digits — the unlit wire mesh behind the active digit */
+    /* Ghost cathode digits */
     .tube .ghosts {
       position: absolute;
       inset: 0;
@@ -232,7 +237,8 @@
       font-variant-numeric: tabular-nums;
       font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 500;
-      color: rgba(60, 45, 25, 0.12);
+      color: rgba(90, 70, 40, 0.18);
+      text-shadow: 0 0 2px rgba(90, 70, 40, 0.08);
       pointer-events: none;
       z-index: 0;
     }
@@ -246,24 +252,26 @@
       font-variant-numeric: tabular-nums;
       font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 500;
-      color: #ffb040;
+      color: #ffb848;
       text-shadow:
-        0 0 2px rgba(255, 176, 64, 1),
-        0 0 6px rgba(255, 160, 50, 0.9),
-        0 0 14px rgba(255, 140, 30, 0.5),
-        0 0 28px rgba(255, 120, 20, 0.2),
-        0 0 48px rgba(255, 100, 10, 0.08);
+        0 0 3px rgba(255, 184, 72, 1),
+        0 0 8px rgba(255, 165, 55, 1),
+        0 0 18px rgba(255, 140, 30, 0.7),
+        0 0 36px rgba(255, 120, 20, 0.35),
+        0 0 60px rgba(255, 100, 10, 0.15),
+        0 0 90px rgba(255, 80, 5, 0.06);
       position: relative;
       z-index: 1;
-      animation: digitGlow 2.5s ease-in-out infinite;
+      animation: digitGlow 1.8s ease-in-out infinite;
       animation-delay: var(--flicker-delay, 0s);
     }
 
     @keyframes digitGlow {
       0%, 100% { opacity: 1; }
-      25% { opacity: 0.94; }
-      50% { opacity: 1; }
-      75% { opacity: 0.96; }
+      20% { opacity: 0.88; }
+      40% { opacity: 1; }
+      60% { opacity: 0.92; }
+      80% { opacity: 1; }
     }
 
     /* Neon separator dots */
@@ -274,29 +282,29 @@
       align-items: center;
       justify-content: center;
       gap: clamp(10px, 3vw, 16px);
-      width: clamp(12px, 3vw, 18px);
-      height: clamp(56px, 12vw, 72px);
+      width: clamp(14px, 3.5vw, 20px);
+      height: clamp(60px, 13vw, 76px);
     }
 
     .neon-sep i {
       display: block;
-      width: 5px;
-      height: 5px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: #ffaa30;
+      background: #ffb840;
       box-shadow:
-        0 0 3px rgba(255, 170, 48, 1),
-        0 0 8px rgba(255, 150, 40, 0.6),
-        0 0 16px rgba(255, 130, 20, 0.25),
-        0 0 28px rgba(255, 110, 10, 0.08);
-      animation: sepPulse 1s ease-in-out infinite;
+        0 0 4px rgba(255, 184, 64, 1),
+        0 0 10px rgba(255, 150, 40, 0.8),
+        0 0 20px rgba(255, 130, 20, 0.4),
+        0 0 40px rgba(255, 110, 10, 0.15);
+      animation: sepBlink 0.8s step-end infinite;
     }
 
-    .neon-sep i:nth-child(2) { animation-delay: 0.05s; }
+    .neon-sep i:nth-child(2) { animation-delay: 0.02s; }
 
-    @keyframes sepPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
+    @keyframes sepBlink {
+      0% { opacity: 1; }
+      50% { opacity: 0.15; }
     }
 
     /* Pin base decoration under tubes */
@@ -305,36 +313,36 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
       margin-top: 6px;
       position: relative;
       z-index: 1;
     }
 
     .tube-base .pin {
-      width: clamp(36px, 8vw, 48px);
-      height: 4px;
-      background: linear-gradient(180deg, #1e1810 0%, #120e08 100%);
-      border-radius: 0 0 3px 3px;
+      width: clamp(40px, 9vw, 52px);
+      height: 5px;
+      background: linear-gradient(180deg, #201a10 0%, #140f08 100%);
+      border-radius: 0 0 4px 4px;
       box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 200, 100, 0.03);
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 200, 100, 0.04);
       position: relative;
     }
 
     .tube-base .pin::before {
       content: "";
       position: absolute;
-      top: -2px;
-      left: 25%;
-      right: 25%;
-      height: 2px;
-      background: radial-gradient(ellipse at 50% 100%, rgba(255, 150, 40, 0.06) 0%, transparent 80%);
+      top: -4px;
+      left: 15%;
+      right: 15%;
+      height: 4px;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255, 150, 40, 0.1) 0%, transparent 80%);
     }
 
     .tube-base .pin-gap {
-      width: clamp(12px, 3vw, 18px);
-      height: 4px;
+      width: clamp(14px, 3.5vw, 20px);
+      height: 5px;
     }
 
     /* ═══ CALCULATOR ═══ */
