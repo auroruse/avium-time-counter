@@ -76,7 +76,7 @@
     }
 
     .clock-housing {
-      background: linear-gradient(180deg, #12100e 0%, #0e0c0a 30%, #0a0908 100%);
+      background: linear-gradient(180deg, #16130f 0%, #12100e 20%, #0e0c0a 50%, #0a0908 100%);
       border-radius: 16px;
       padding: 8px;
       border: 1px solid #2a241c;
@@ -84,11 +84,12 @@
         0 2px 0 #1a1612,
         0 4px 0 #14110e,
         0 16px 48px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        0 0 80px rgba(255, 140, 30, 0.015),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     .clock-face {
-      background: linear-gradient(170deg, #0a0908 0%, #080706 50%, #060504 100%);
+      background: linear-gradient(170deg, #0c0a09 0%, #080706 50%, #060504 100%);
       border-radius: 10px;
       padding: 36px 32px 32px;
       position: relative;
@@ -102,20 +103,24 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 60% 40% at 50% 55%, rgba(255, 150, 40, 0.02) 0%, transparent 70%);
+      background: radial-gradient(ellipse 70% 50% at 50% 60%, rgba(255, 150, 40, 0.025) 0%, transparent 70%);
       pointer-events: none;
+      animation: ambientPulse 4s ease-in-out infinite;
     }
 
     .clock-face::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 40%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0%, transparent 100%);
       border-radius: 10px 10px 0 0;
       pointer-events: none;
+    }
+
+    @keyframes ambientPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
 
     .clock-dow {
@@ -125,7 +130,7 @@
       letter-spacing: 0.5em;
       text-transform: uppercase;
       color: #7a5a2a;
-      text-shadow: 0 0 8px rgba(255, 150, 40, 0.08);
+      text-shadow: 0 0 10px rgba(255, 150, 40, 0.1);
       margin-bottom: 16px;
       position: relative;
       z-index: 1;
@@ -166,18 +171,31 @@
       width: clamp(36px, 8vw, 48px);
       height: clamp(56px, 12vw, 72px);
       background:
-        radial-gradient(ellipse 80% 60% at 50% 55%, rgba(255, 140, 30, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 50% 55%, rgba(255, 140, 30, 0.05) 0%, transparent 60%),
         radial-gradient(ellipse at 50% 50%, #0e0b08 0%, #080604 100%);
-      border: 1px solid rgba(80, 65, 40, 0.2);
-      border-top-color: rgba(100, 80, 50, 0.25);
+      border: 1px solid rgba(80, 65, 40, 0.25);
+      border-top-color: rgba(100, 80, 50, 0.3);
       border-bottom-color: rgba(40, 30, 18, 0.3);
       border-radius: 10px 10px 6px 6px;
       position: relative;
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.03),
-        inset 0 0 16px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        inset 0 0 20px rgba(0, 0, 0, 0.5),
         inset 0 -4px 12px rgba(0, 0, 0, 0.2),
-        0 4px 8px rgba(0, 0, 0, 0.3);
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 140, 30, 0.02);
+      animation: tubeFlicker 3s ease-in-out infinite;
+      animation-delay: var(--flicker-delay, 0s);
+    }
+
+    @keyframes tubeFlicker {
+      0%, 100% { filter: brightness(1); }
+      15% { filter: brightness(0.97); }
+      30% { filter: brightness(1.01); }
+      45% { filter: brightness(0.98); }
+      60% { filter: brightness(1); }
+      75% { filter: brightness(0.99); }
+      88% { filter: brightness(1.02); }
     }
 
     .tube::before {
@@ -187,7 +205,7 @@
       left: 4px;
       right: 4px;
       height: 35%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, transparent 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
       border-radius: 8px 8px 50% 50%;
       pointer-events: none;
     }
@@ -199,8 +217,28 @@
       left: 30%;
       right: 30%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(80, 60, 30, 0.15), transparent);
+      background: linear-gradient(90deg, transparent, rgba(120, 90, 40, 0.2), transparent);
       pointer-events: none;
+    }
+
+    /* Ghost cathode digits — the unlit wire mesh behind the active digit */
+    .tube .ghosts {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 500;
+      color: rgba(60, 45, 25, 0.12);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .tube .ghost {
+      position: absolute;
     }
 
     .tube .digit {
@@ -210,13 +248,25 @@
       font-weight: 500;
       color: #ffb040;
       text-shadow:
-        0 0 3px rgba(255, 176, 64, 1),
-        0 0 8px rgba(255, 150, 40, 0.7),
-        0 0 18px rgba(255, 130, 20, 0.35),
-        0 0 36px rgba(255, 110, 10, 0.12);
+        0 0 2px rgba(255, 176, 64, 1),
+        0 0 6px rgba(255, 160, 50, 0.9),
+        0 0 14px rgba(255, 140, 30, 0.5),
+        0 0 28px rgba(255, 120, 20, 0.2),
+        0 0 48px rgba(255, 100, 10, 0.08);
       position: relative;
       z-index: 1;
+      animation: digitGlow 2.5s ease-in-out infinite;
+      animation-delay: var(--flicker-delay, 0s);
     }
+
+    @keyframes digitGlow {
+      0%, 100% { opacity: 1; }
+      25% { opacity: 0.94; }
+      50% { opacity: 1; }
+      75% { opacity: 0.96; }
+    }
+
+    /* Neon separator dots */
 
     .neon-sep {
       display: flex;
@@ -230,14 +280,23 @@
 
     .neon-sep i {
       display: block;
-      width: 4px;
-      height: 4px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
-      background: #e89020;
+      background: #ffaa30;
       box-shadow:
-        0 0 3px rgba(232, 144, 32, 0.9),
-        0 0 8px rgba(255, 150, 40, 0.4),
-        0 0 14px rgba(255, 130, 20, 0.15);
+        0 0 3px rgba(255, 170, 48, 1),
+        0 0 8px rgba(255, 150, 40, 0.6),
+        0 0 16px rgba(255, 130, 20, 0.25),
+        0 0 28px rgba(255, 110, 10, 0.08);
+      animation: sepPulse 1s ease-in-out infinite;
+    }
+
+    .neon-sep i:nth-child(2) { animation-delay: 0.05s; }
+
+    @keyframes sepPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
     }
 
     /* Pin base decoration under tubes */
@@ -254,15 +313,28 @@
 
     .tube-base .pin {
       width: clamp(36px, 8vw, 48px);
-      height: 3px;
-      background: linear-gradient(180deg, #1a1510 0%, #0e0c08 100%);
+      height: 4px;
+      background: linear-gradient(180deg, #1e1810 0%, #120e08 100%);
       border-radius: 0 0 3px 3px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 200, 100, 0.03);
+      position: relative;
+    }
+
+    .tube-base .pin::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: 25%;
+      right: 25%;
+      height: 2px;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255, 150, 40, 0.06) 0%, transparent 80%);
     }
 
     .tube-base .pin-gap {
       width: clamp(12px, 3vw, 18px);
-      height: 3px;
+      height: 4px;
     }
 
     /* ═══ CALCULATOR ═══ */
@@ -321,13 +393,36 @@
     .form-group { margin-bottom: 14px; }
 
     .form-group label {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-dim);
       margin-bottom: 6px;
+    }
+
+    .now-btn {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-light);
+      background: none;
+      border: 1px solid var(--border-hover);
+      border-radius: 4px;
+      padding: 2px 7px;
+      cursor: pointer;
+      font-family: 'Neue Montreal', 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .now-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-bright);
+      background: rgba(61, 83, 67, 0.15);
     }
 
     .form-group input {
@@ -422,8 +517,6 @@
     .epoch-table .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 11px; }
     .epoch-table .dim { color: var(--text-muted); }
 
-    .footer { padding: 24px 0 32px; font-size: 11px; color: var(--text-dim); text-align: center; }
-
     @media (max-width: 520px) {
       .panel, .epoch-section, .clock { max-width: calc(100% - 32px); }
       .header { padding: 20px 16px 0; }
@@ -456,7 +549,7 @@
       <button id="tab-ic-to-ooc" class="tab">IC &rarr; OOC</button>
     </div>
     <div id="form-ooc-to-ic">
-      <div class="form-group"><label>OOC Date</label><input type="date" id="ooc-date"></div>
+      <div class="form-group"><label>OOC Date <button class="now-btn" id="btn-now">Now</button></label><input type="date" id="ooc-date"></div>
       <div class="form-group"><label>OOC Time</label><input type="time" id="ooc-time" value="00:00"></div>
       <div class="form-group"><label>Hours from GMT</label><input type="number" id="ooc-offset" value="0" step="0.5"></div>
       <button class="calc-btn" id="btn-ooc-to-ic">Calculate</button>
@@ -478,8 +571,6 @@
       </table>
     </details>
   </div>
-
-  <div class="footer"></div>
 
   <script>
     var EPOCHS = [
@@ -559,17 +650,29 @@
 
     // NIXIE TUBE RENDERER
 
+    var GHOST_DIGITS = "0123456789";
+
     function buildTubes(h, m, s) {
       var time = h + ":" + m + ":" + s;
       var tubes = '<div class="nixie-row">';
       var bases = '<div class="tube-base">';
+      var tubeIdx = 0;
       for (var i = 0; i < time.length; i++) {
         if (time[i] === ":") {
           tubes += '<div class="neon-sep"><i></i><i></i></div>';
           bases += '<div class="pin-gap"></div>';
         } else {
-          tubes += '<div class="tube"><span class="digit">' + time[i] + '</span></div>';
+          var delay = (tubeIdx * 0.4 + tubeIdx * tubeIdx * 0.1) % 3;
+          var ghosts = '<div class="ghosts">';
+          for (var g = 0; g < 10; g++) {
+            if (String(g) !== time[i]) {
+              ghosts += '<span class="ghost">' + g + '</span>';
+            }
+          }
+          ghosts += '</div>';
+          tubes += '<div class="tube" style="--flicker-delay:' + delay.toFixed(2) + 's">' + ghosts + '<span class="digit" style="--flicker-delay:' + (delay + 0.7).toFixed(2) + 's">' + time[i] + '</span></div>';
           bases += '<div class="pin"></div>';
+          tubeIdx++;
         }
       }
       tubes += '</div>';
@@ -577,9 +680,7 @@
       return tubes + bases;
     }
 
-    // LIVE CLOCK — rAF loop polls at display refresh rate (60fps).
-    // Only touches the DOM when the IC second actually changes.
-    // setInterval fallback keeps it ticking in background tabs.
+    // LIVE CLOCK
 
     var lastSec = -1;
 
@@ -607,6 +708,18 @@
       document.getElementById("form-ooc-to-ic").classList.toggle("hidden", mode !== "ooc-to-ic");
       document.getElementById("form-ic-to-ooc").classList.toggle("hidden", mode !== "ic-to-ooc");
       document.getElementById("calc-result").textContent = "";
+    }
+
+    function prefillNow() {
+      var now = new Date();
+      var y = now.getFullYear();
+      var mo = String(now.getMonth() + 1).padStart(2, "0");
+      var d = String(now.getDate()).padStart(2, "0");
+      var h = String(now.getHours()).padStart(2, "0");
+      var mi = String(now.getMinutes()).padStart(2, "0");
+      document.getElementById("ooc-date").value = y + "-" + mo + "-" + d;
+      document.getElementById("ooc-time").value = h + ":" + mi;
+      document.getElementById("ooc-offset").value = -(now.getTimezoneOffset() / 60);
     }
 
     function calcOtoI() {
@@ -662,6 +775,7 @@
         document.getElementById("tab-ic-to-ooc").onclick = function(){ setCalcMode("ic-to-ooc"); };
         document.getElementById("btn-ooc-to-ic").onclick = calcOtoI;
         document.getElementById("btn-ic-to-ooc").onclick = calcItoO;
+        document.getElementById("btn-now").onclick = prefillNow;
         renderEpochs();
       }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
