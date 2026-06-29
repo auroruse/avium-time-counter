@@ -123,35 +123,101 @@
       50% { opacity: 0.5; }
     }
 
-    .clock-dow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      color: #9a7a3a;
-      text-shadow: 0 0 12px rgba(255, 150, 40, 0.2);
-      margin-bottom: 16px;
+    /* Split-flap display for day-of-week and date */
+
+    .clock-dow, .clock-date {
       position: relative;
       z-index: 1;
     }
 
-    .clock-date {
-      font-family: 'JetBrains Mono', monospace;
-      font-variant-numeric: tabular-nums;
-      font-size: clamp(2rem, 5.5vw, 3.2rem);
-      font-weight: 600;
-      color: #ffc060;
-      letter-spacing: 0.05em;
-      margin-bottom: 24px;
+    .flap-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .flap-row.dow { margin-bottom: 14px; }
+    .flap-row.date { margin-bottom: 24px; }
+
+    .flap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #141210 0%, #0f0d0b 48%, #0c0a08 52%, #100e0c 100%);
+      border: 1px solid rgba(60, 50, 35, 0.3);
+      border-radius: 3px;
+    }
+
+    .flap::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 1px 0 rgba(60, 50, 35, 0.12);
+      z-index: 2;
+    }
+
+    .flap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 40%, transparent 60%, rgba(0, 0, 0, 0.08) 100%);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .flap span {
       position: relative;
       z-index: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: #e8c070;
       text-shadow:
-        0 0 4px rgba(255, 192, 96, 1),
-        0 0 15px rgba(255, 160, 50, 0.7),
-        0 0 35px rgba(255, 140, 30, 0.35),
-        0 0 70px rgba(255, 120, 20, 0.15),
-        0 0 120px rgba(255, 100, 10, 0.06);
+        0 0 4px rgba(232, 192, 112, 0.5),
+        0 0 10px rgba(255, 160, 50, 0.15);
+    }
+
+    .flap-space {
+      display: inline-block;
+    }
+
+    /* Day-of-week: small flaps */
+    .flap-row.dow .flap {
+      width: clamp(14px, 2.8vw, 18px);
+      height: clamp(18px, 3.5vw, 22px);
+    }
+
+    .flap-row.dow .flap span {
+      font-size: clamp(9px, 1.8vw, 11px);
+      letter-spacing: 0.04em;
+    }
+
+    .flap-row.dow .flap-space {
+      width: 4px;
+    }
+
+    /* Date: larger flaps */
+    .flap-row.date .flap {
+      width: clamp(24px, 5vw, 34px);
+      height: clamp(34px, 6.5vw, 46px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.02),
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .flap-row.date .flap span {
+      font-size: clamp(1rem, 2.8vw, 1.5rem);
+      letter-spacing: 0.02em;
+    }
+
+    .flap-row.date .flap-space {
+      width: clamp(6px, 1.5vw, 10px);
     }
 
     /* Individual nixie tubes */
@@ -656,6 +722,21 @@
         String(d.getUTCHours()).padStart(2,"0") + ":" + String(d.getUTCMinutes()).padStart(2,"0") + ":" + String(d.getUTCSeconds()).padStart(2,"0") + " UTC";
     }
 
+    // SPLIT-FLAP RENDERER
+
+    function buildFlaps(text, cls) {
+      var html = '<div class="flap-row ' + cls + '">';
+      for (var i = 0; i < text.length; i++) {
+        if (text[i] === ' ') {
+          html += '<div class="flap-space"></div>';
+        } else {
+          html += '<div class="flap"><span>' + text[i] + '</span></div>';
+        }
+      }
+      html += '</div>';
+      return html;
+    }
+
     // NIXIE TUBE RENDERER
 
     var GHOST_DIGITS = "0123456789";
@@ -698,8 +779,8 @@
       if (icSec !== lastSec) {
         lastSec = icSec;
         var ic = formatIC(new Date(icMsExact));
-        document.getElementById("clock-dow").textContent = ic.dow;
-        document.getElementById("clock-date").textContent = ic.day + " " + ic.month + " " + ic.year;
+        document.getElementById("clock-dow").innerHTML = buildFlaps(ic.dow, "dow");
+        document.getElementById("clock-date").innerHTML = buildFlaps(ic.day + " " + ic.month + " " + ic.year, "date");
         document.getElementById("clock-time").innerHTML = buildTubes(ic.h, ic.m, ic.s);
       }
     }
