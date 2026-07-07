@@ -692,22 +692,27 @@
     function oocToIC(oocTs) { return new Date(oocToICMs(oocTs)); }
 
     function icToOOC(icTs) {
-      var idx = 0;
       for (var i = 0; i < EPOCHS.length; i++) {
-        var s = parseIC(EPOCHS[i].icStart);
+        var ep = EPOCHS[i];
+        var epStart = parseIC(ep.icStart);
         if (i < EPOCHS.length - 1) {
-          var ns = parseIC(EPOCHS[i + 1].icStart);
-          if (i > 0) {
-            var pe = EPOCHS[i - 1];
-            var end = parseIC(pe.icStart) + (parseOOC(EPOCHS[i].oocStart) - parseOOC(pe.oocStart)) * getMultiplier(pe.daysPerYear);
-            if (icTs > end && icTs < s) return { skipped: true, epochIndex: i };
+          var next = EPOCHS[i + 1];
+          // Where this epoch's own clock would be when the next epoch's OOC anchor hits —
+          // anything past this point but before the next epoch's IC start was skipped.
+          var natEnd = epStart + (parseOOC(next.oocStart) - parseOOC(ep.oocStart)) * getMultiplier(ep.daysPerYear);
+          var nextStart = parseIC(next.icStart);
+          if (icTs <= natEnd) {
+            var elapsed = icTs - epStart;
+            return { skipped: false, oocDate: new Date(parseOOC(ep.oocStart) + elapsed / getMultiplier(ep.daysPerYear)), epochIndex: i };
           }
-          if (icTs >= s && icTs < ns) { idx = i; break; }
-        } else { idx = i; }
+          if (icTs < nextStart) return { skipped: true, epochIndex: i };
+          // otherwise icTs belongs to a later epoch — keep walking
+        } else {
+          var elapsedLast = icTs - epStart;
+          return { skipped: false, oocDate: new Date(parseOOC(ep.oocStart) + elapsedLast / getMultiplier(ep.daysPerYear)), epochIndex: i };
+        }
       }
-      var ep = EPOCHS[idx];
-      var elapsed = icTs - parseIC(ep.icStart);
-      return { skipped: false, oocDate: new Date(parseOOC(ep.oocStart) + elapsed / getMultiplier(ep.daysPerYear)), epochIndex: idx };
+      return { skipped: true, epochIndex: -1 };
     }
 
     var IC_DAYS = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
@@ -827,7 +832,10 @@
       var ooc = new Date(dv + "T00:00:00Z");
       ooc.setUTCHours(p[0], p[1], 0, 0);
       ooc.setTime(ooc.getTime() - off * 3600000);
-      var ic = formatIC(oocToIC(ooc.getTime()));
+      if (isNaN(ooc.getTime())) { showRes("Enter a valid OOC date.", true); return; }
+      var icDate = oocToIC(ooc.getTime());
+      if (isNaN(icDate.getTime())) { showRes("That date is out of range.", true); return; }
+      var ic = formatIC(icDate);
       showRes(ic.dow + ", " + ic.day + " " + ic.month + " " + ic.year + " — " + ic.h + ":" + ic.m + ":" + ic.s);
     }
 
@@ -836,9 +844,11 @@
       var tv = document.getElementById("ic-time").value || "00:00";
       if (!dv) { showRes("Enter an IC date.", true); return; }
       var ts = parseIC(dv + "T" + tv + ":00");
+      if (isNaN(ts)) { showRes("Enter a valid IC date.", true); return; }
       if (ts < parseIC(EPOCHS[0].icStart)) { showRes("This IC date is before recorded time.", true); return; }
       var r = icToOOC(ts);
       if (r.skipped) { showRes("This IC date was skipped by a timeskip.", true); return; }
+      if (isNaN(r.oocDate.getTime())) { showRes("That date is out of range.", true); return; }
       showRes(formatOOC(r.oocDate));
     }
 
