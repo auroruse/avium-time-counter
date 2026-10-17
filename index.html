@@ -44,36 +44,79 @@
     ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-    .header {
+    /* ═══ TOP BAR ═══ */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      width: 100%;
+      height: 52px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 28px 0 0;
-      margin-bottom: 40px;
+      gap: 24px;
+      padding: 0 24px;
+      background: rgba(15, 19, 16, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
     }
 
-    .header-bar {
-      width: 3px;
-      height: 28px;
-      background: linear-gradient(180deg, var(--text-bright) 0%, var(--accent) 100%);
-      border-radius: 2px;
-    }
-
-    .header h1 {
-      font-size: 18px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-bright);
+      text-decoration: none;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-bright);
+      white-space: nowrap;
     }
+
+    .brand img { height: 28px; width: auto; display: block; }
+
+    .suite {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+      overflow-x: auto;
+    }
+
+    .suite a {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .suite a:hover, .suite a:focus-visible { color: var(--text-bright); background: #141a14; outline: none; }
+
+    /* ═══ LAYOUT ═══ */
+
+    .board {
+      width: 100%;
+      max-width: 1240px;
+      padding: 32px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 640px) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .board .span { grid-column: 1 / -1; }
+    .stack { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 
     /* ═══ NIXIE CLOCK ═══ */
 
     .clock {
       text-align: center;
-      margin-bottom: 56px;
-      width: 100%;
-      max-width: 580px;
+      min-width: 0;
     }
 
     .clock-housing {
@@ -420,9 +463,7 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 24px;
-      width: 100%;
-      max-width: 580px;
-      margin-bottom: 32px;
+      min-width: 0;
     }
 
     .panel-title {
@@ -567,86 +608,238 @@
     .calc-result.error { color: var(--red); border-color: #bf616a33; }
     .hidden { display: none !important; }
 
-    /* ═══ EPOCH LOG ═══ */
-
-    .epoch-section { width: 100%; max-width: 580px; margin-bottom: 48px; }
-
-    .epoch-details summary {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--text-dim);
-      cursor: pointer; user-select: none; list-style: none;
-      display: flex; align-items: center; gap: 8px; transition: color 0.15s;
+    .calc-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) auto;
+      gap: 12px;
+      align-items: end;
     }
 
-    .epoch-details summary:hover { color: var(--text-bright); }
-    .epoch-details summary::-webkit-details-marker { display: none; }
-    .epoch-details summary::marker { content: ""; }
-    .epoch-details summary .arrow { display: inline-block; font-size: 8px; color: var(--text-dim); transition: transform 0.15s; }
-    .epoch-details[open] summary .arrow { transform: rotate(90deg); }
+    .calc-row .form-group { margin-bottom: 0; }
+    .calc-row .calc-btn { width: auto; margin-top: 0; padding: 9px 28px; }
 
-    .epoch-table { width: 100%; margin-top: 12px; border-spacing: 0; }
-    .epoch-table thead th { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
-    .epoch-table tbody td { font-size: 12px; padding: 8px; border-bottom: 1px solid var(--border); color: var(--text); }
-    .epoch-table tbody tr:last-child td { border-bottom: none; }
-    .epoch-table tbody tr:hover td { background: #141a14; }
-    .epoch-table .epoch-index { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 10px; width: 24px; }
-    .epoch-table .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; font-size: 11px; }
-    .epoch-table .dim { color: var(--text-muted); }
+    /* ═══ LEDGERS (rates, world clocks) ═══ */
+
+    .ledger { width: 100%; border-spacing: 0; table-layout: fixed; }
+
+    .ledger th {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-align: left;
+      padding: 0 8px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ledger td {
+      font-size: 12px;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ledger tr:last-child td { border-bottom: none; }
+    .ledger .num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; text-align: right; }
+    .ledger th.num { text-align: right; }
+    .ledger .dim { color: var(--text-muted); }
+    .ledger .glow { color: #ffb848; text-shadow: 0 0 8px rgba(255, 150, 40, 0.35); }
+    .ledger .row-label { color: var(--text-muted); }
+
+    /* ═══ EPOCH TIMELINE ═══ */
+
+    .timeline { position: relative; padding: 26px 0 30px; }
+
+    .tl-track {
+      position: relative;
+      height: 40px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+
+    .tl-seg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-right: 1px solid var(--bg);
+      cursor: pointer;
+      outline: none;
+      transition: filter 0.15s;
+    }
+
+    .tl-seg.epoch { background: linear-gradient(180deg, #4a6551 0%, #3d5343 100%); }
+    .tl-seg.epoch.fast { background: linear-gradient(180deg, #627661 0%, #4f6550 100%); }
+
+    .tl-seg.gap {
+      background: repeating-linear-gradient(135deg, rgba(191, 97, 106, 0.28) 0 6px, transparent 6px 12px);
+      box-shadow: inset 0 0 0 1px rgba(191, 97, 106, 0.35);
+    }
+
+    .tl-seg:hover, .tl-seg:focus-visible, .tl-seg.sel { filter: brightness(1.35); }
+
+    .tl-seg span {
+      position: absolute;
+      left: 8px;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-bright);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: clip;
+      pointer-events: none;
+    }
+
+    .tl-seg.gap span { color: #d98a92; font-weight: 500; }
+
+    .tl-tick {
+      position: absolute;
+      top: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      transform: translateX(-50%);
+    }
+
+    .tl-tick::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      width: 1px;
+      height: 50px;
+      background: var(--border-hover);
+    }
+
+    .tl-now {
+      position: absolute;
+      bottom: 6px;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: #ffb848;
+      text-shadow: 0 0 8px rgba(255, 150, 40, 0.6);
+      white-space: nowrap;
+    }
+
+    .tl-now::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      width: 2px;
+      height: 50px;
+      margin-left: -1px;
+      background: #ffb848;
+      box-shadow: 0 0 8px rgba(255, 150, 40, 0.8);
+    }
+
+    .tl-detail {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      color: var(--text);
+      min-height: 18px;
+    }
+
+    .tl-detail b { color: var(--text-bright); font-weight: 600; }
+
+    /* ═══ RESPONSIVE / MOTION ═══ */
+
+    @media (max-width: 1000px) {
+      .board { grid-template-columns: minmax(0, 1fr); }
+    }
 
     @media (max-width: 520px) {
-      .panel, .epoch-section, .clock { max-width: calc(100% - 32px); }
-      .header { padding: 20px 16px 0; }
+      .board { padding: 20px 12px 32px; }
+      .topbar { padding: 0 12px; gap: 12px; }
+      .brand span { display: none; }
       .tabs { flex-wrap: wrap; }
       .clock-face { padding: 28px 16px 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-bar"></div>
-    <h1>Avium Time Counter</h1>
-  </div>
+  <header class="topbar">
+    <a class="brand" href="./"><img src="logo.png" alt="" onerror="this.remove()"><span>Avium Time Counter</span></a>
+    <nav class="suite">
+      <a href="https://auroruse.github.io/the-talopedia/">Talopedia</a>
+      <a href="https://auroruse.github.io/avium-map/">Map</a>
+      <a href="https://auroruse.github.io/avium-football-engine/">Football Engine</a>
+      <a href="https://discord.gg/zVhxZXFea4">Discord</a>
+    </nav>
+  </header>
 
-  <div class="clock">
-    <div class="clock-housing">
-      <div class="clock-face">
-        <div id="clock-dow" class="clock-dow">&mdash;</div>
-        <div id="clock-date" class="clock-date">&mdash;</div>
-        <div id="clock-time"></div>
+  <main class="board">
+    <div class="stack">
+      <div class="clock">
+        <div class="clock-housing">
+          <div class="clock-face">
+            <div id="clock-dow" class="clock-dow">&mdash;</div>
+            <div id="clock-date" class="clock-date">&mdash;</div>
+            <div id="clock-time"></div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="panel">
-    <div class="panel-title">Time Calculator</div>
-    <div class="tabs">
-      <button id="tab-ooc-to-ic" class="tab active">OOC &rarr; IC</button>
-      <button id="tab-ic-to-ooc" class="tab">IC &rarr; OOC</button>
+      <section class="panel">
+        <div class="panel-title">Rate</div>
+        <table class="ledger">
+          <colgroup><col style="width:55%"><col style="width:45%"></colgroup>
+          <tbody id="rates"></tbody>
+        </table>
+      </section>
     </div>
-    <div id="form-ooc-to-ic">
-      <div class="form-group"><label>OOC Date <button class="now-btn" id="btn-now">Now</button></label><input type="date" id="ooc-date"></div>
-      <div class="form-group"><label>OOC Time</label><input type="time" id="ooc-time" value="00:00"></div>
-      <div class="form-group"><label>Hours from GMT</label><input type="number" id="ooc-offset" value="0" step="0.5"></div>
-      <button class="calc-btn" id="btn-ooc-to-ic">Calculate</button>
-    </div>
-    <div id="form-ic-to-ooc" class="hidden">
-      <div class="form-group"><label>IC Date</label><input type="date" id="ic-date"></div>
-      <div class="form-group"><label>IC Time</label><input type="time" id="ic-time" value="00:00"></div>
-      <button class="calc-btn" id="btn-ic-to-ooc">Calculate</button>
-    </div>
-    <div id="calc-result" class="calc-result"></div>
-  </div>
 
-  <div class="epoch-section">
-    <details class="epoch-details">
-      <summary><span class="arrow">&#9654;</span> Epoch Log</summary>
-      <table class="epoch-table">
-        <thead><tr><th></th><th>OOC Start</th><th>IC Start</th><th>Rate</th><th>Mult</th><th>Note</th></tr></thead>
-        <tbody id="epoch-tbody"></tbody>
+    <section class="panel">
+      <div class="panel-title">World Clocks</div>
+      <table class="ledger">
+        <colgroup><col style="width:27%"><col style="width:23%"><col style="width:14%"><col style="width:20%"><col style="width:16%"></colgroup>
+        <thead><tr><th>Capital</th><th>Nation</th><th class="num">Zone</th><th class="num">Date</th><th class="num">Time</th></tr></thead>
+        <tbody id="world"></tbody>
       </table>
-    </details>
-  </div>
+    </section>
+
+    <section class="panel span">
+      <div class="panel-title">Epochs</div>
+      <div class="timeline"><div class="tl-track" id="tl-track"></div></div>
+      <div class="tl-detail" id="tl-detail"></div>
+    </section>
+
+    <section class="panel span">
+      <div class="panel-title">Time Calculator</div>
+      <div class="tabs">
+        <button id="tab-ooc-to-ic" class="tab active">OOC &rarr; IC</button>
+        <button id="tab-ic-to-ooc" class="tab">IC &rarr; OOC</button>
+      </div>
+      <div id="form-ooc-to-ic" class="calc-row">
+        <div class="form-group"><label>OOC Date <button class="now-btn" id="btn-now">Now</button></label><input type="date" id="ooc-date"></div>
+        <div class="form-group"><label>OOC Time</label><input type="time" id="ooc-time" value="00:00"></div>
+        <div class="form-group"><label>Hours from GMT</label><input type="number" id="ooc-offset" value="0" step="0.5"></div>
+        <button class="calc-btn" id="btn-ooc-to-ic">Calculate</button>
+      </div>
+      <div id="form-ic-to-ooc" class="calc-row hidden">
+        <div class="form-group"><label>IC Date</label><input type="date" id="ic-date"></div>
+        <div class="form-group"><label>IC Time</label><input type="time" id="ic-time" value="00:00"></div>
+        <button class="calc-btn" id="btn-ic-to-ooc">Calculate</button>
+      </div>
+      <div id="calc-result" class="calc-result"></div>
+    </section>
+  </main>
 
   <script>
     var EPOCHS = [
@@ -770,8 +963,6 @@
 
     // NIXIE TUBE RENDERER
 
-    var GHOST_DIGITS = "0123456789";
-
     function buildTubes(h, m, s) {
       var time = h + ":" + m + ":" + s;
       var tubes = '<div class="nixie-row">';
@@ -800,12 +991,157 @@
       return tubes + bases;
     }
 
+    // SHARED FORMATTING
+
+    var SHORT_DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var SHORT_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    function pad(n) { return String(n).padStart(2, "0"); }
+
+    function shortDate(ms) {
+      var d = new Date(ms);
+      return d.getUTCDate() + " " + SHORT_MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear();
+    }
+
+    function duration(ms) {
+      var t = Math.max(0, Math.round(ms / 1000));
+      var d = Math.floor(t / 86400), h = Math.floor(t % 86400 / 3600), m = Math.floor(t % 3600 / 60), sec = t % 60;
+      if (d) return d + "d " + h + "h " + pad(m) + "m";
+      if (h) return h + "h " + pad(m) + "m " + pad(sec) + "s";
+      return m + "m " + pad(sec) + "s";
+    }
+
+    // RATE LEDGER
+
+    function renderRates(nowOoc, icMs) {
+      var ep = getActiveEpoch(nowOoc), mult = getMultiplier(ep.daysPerYear);
+      var local = icMs + IC_TIMEZONE_OFFSET * 3600000, d = new Date(local);
+      var y = d.getUTCFullYear(), mo = d.getUTCMonth();
+      // ponytail: countdowns assume the current rate holds; a later epoch already in EPOCHS is ignored
+      function oocUntil(target) { return (target - local) / mult; }
+      var hourIC = Math.round(3600 * mult / 60);
+      var yearAt = new Date(nowOoc + oocUntil(Date.UTC(y + 1, 0, 1)));
+      var rows = [
+        ["Epoch", ep.label],
+        ["Speed", "\u00d7" + mult.toFixed(2) + " \u00b7 " + ep.daysPerYear + " days a year"],
+        ["1 OOC hour", Math.floor(hourIC / 60) + "h " + pad(hourIC % 60) + "m IC"],
+        ["IC day ends in", duration(oocUntil(Date.UTC(y, mo, d.getUTCDate() + 1)))],
+        ["IC month ends in", duration(oocUntil(Date.UTC(y, mo + 1, 1)))],
+        ["IC " + (y + 1) + " begins", SHORT_DAYS[yearAt.getUTCDay()] + " " + shortDate(yearAt.getTime()) + ", " + pad(yearAt.getUTCHours()) + ":" + pad(yearAt.getUTCMinutes()) + " UTC"]
+      ];
+      var html = "";
+      for (var i = 0; i < rows.length; i++) html += '<tr><td class="row-label">' + rows[i][0] + '</td><td class="num' + (i === 3 ? ' glow' : '') + '">' + rows[i][1] + '</td></tr>';
+      document.getElementById("rates").innerHTML = html;
+    }
+
+    // WORLD CLOCKS
+    // ponytail: Avium has no canon time zones; these are solar zones, round(longitude / 15) from
+    // Avium Map coordinates.tsv. Replace with real zones if the ACU ever sets them.
+
+    var CAPITALS = [
+      ["Auritania City", "Auritania", -94.8059], ["Delvin", "Hollosend", -70.5696], ["Port Mercer", "Salishia", -54.9608],
+      ["Mundcaester", "Eivorie", -43.8065], ["Nexus", "E.S.U.", -40.0113], ["Trinacria", "Vicily", -1.3579],
+      ["Eretz", "Shivon", 9.4203], ["Franmark", "Alemannia", 10.3938], ["Kjellberg", "Skjarnland", 13.7829],
+      ["Szerencsehely", "Turulia", 19.2645], ["Nourabad", "Varahmehr", 19.7835], ["Corslawa", "Cortesia", 20.3184],
+      ["Pietari", "Karjania", 25.4439], ["Radagorsk", "Rudania", 32.3884], ["Britannica", "Giathka", 62.9635],
+      ["Shinkeisei", "Nichirin", 101.2211], ["Atanao", "Seignid", 137.6375]
+    ];
+
+    function renderWorld(icMs) {
+      var html = "";
+      for (var i = 0; i < CAPITALS.length; i++) {
+        var off = Math.round(CAPITALS[i][2] / 15) || 0, d = new Date(icMs + off * 3600000);
+        var zone = off === 0 ? "UTC" : "UTC" + (off > 0 ? "+" : "-") + Math.abs(off);
+        html += '<tr><td>' + CAPITALS[i][0] + '</td><td class="dim">' + CAPITALS[i][1] + '</td><td class="num dim">' + zone +
+          '</td><td class="num">' + SHORT_DAYS[d.getUTCDay()] + " " + d.getUTCDate() + " " + SHORT_MONTHS[d.getUTCMonth()] +
+          '</td><td class="num glow">' + pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes()) + '</td></tr>';
+      }
+      document.getElementById("world").innerHTML = html;
+    }
+
+    // EPOCH TIMELINE
+
+    var tlSpans = [], tlSel = -1;
+
+    function epochSpans(nowOoc) {
+      var out = [];
+      for (var i = 0; i < EPOCHS.length; i++) {
+        var ep = EPOCHS[i], o = parseOOC(ep.oocStart);
+        if (o > nowOoc) break;
+        var s = parseIC(ep.icStart), mult = getMultiplier(ep.daysPerYear);
+        var next = EPOCHS[i + 1], started = next && parseOOC(next.oocStart) <= nowOoc;
+        var oEnd = started ? parseOOC(next.oocStart) : nowOoc;
+        var e = s + (oEnd - o) * mult;
+        if (started) e = Math.min(e, parseIC(next.icStart));
+        out.push({ gap: false, ep: ep, s: s, e: e, o: o, oEnd: oEnd, mult: mult, current: !started });
+        if (started && e < parseIC(next.icStart)) out.push({ gap: true, s: e, e: parseIC(next.icStart), o: oEnd });
+      }
+      return out;
+    }
+
+    function showDetail(i) {
+      var sp = tlSpans[i], el = document.getElementById("tl-detail");
+      if (!sp) { el.textContent = ""; return; }
+      if (sp.gap) {
+        el.innerHTML = "<b>Timeskip</b> \u00b7 IC " + shortDate(sp.s) + " \u2192 " + shortDate(sp.e) + " skipped on " + shortDate(sp.o) +
+          " OOC \u00b7 " + Math.round((sp.e - sp.s) / DAY_MS) + " IC days";
+      } else {
+        el.innerHTML = "<b>" + sp.ep.label + "</b> \u00b7 IC " + shortDate(sp.s) + " \u2192 " + (sp.current ? "now" : shortDate(sp.e)) +
+          " \u00b7 OOC " + shortDate(sp.o) + " \u2192 " + (sp.current ? "now" : shortDate(sp.oEnd)) +
+          " \u00b7 \u00d7" + sp.mult.toFixed(2) + " (" + sp.ep.daysPerYear + " days a year)";
+      }
+      var segs = document.querySelectorAll(".tl-seg");
+      for (var k = 0; k < segs.length; k++) segs[k].classList.toggle("sel", k === i);
+    }
+
+    function renderTimeline(nowOoc, icMs) {
+      tlSpans = epochSpans(nowOoc);
+      var track = document.getElementById("tl-track"), wrap = track.parentNode;
+      var min = tlSpans[0].s, max = icMs + (icMs - min) * 0.03;
+      function pct(t) { return ((t - min) / (max - min) * 100).toFixed(3) + "%"; }
+
+      if (track.children.length !== tlSpans.length) {
+        track.innerHTML = "";
+        tlSpans.forEach(function(sp, i) {
+          var seg = document.createElement("div");
+          seg.className = "tl-seg " + (sp.gap ? "gap" : "epoch" + (sp.mult > 10 ? " fast" : ""));
+          seg.tabIndex = 0;
+          seg.innerHTML = "<span>" + (sp.gap ? "Timeskip" : sp.ep.label + " \u00d7" + sp.mult.toFixed(2)) + "</span>";
+          seg.onmouseenter = seg.onfocus = function() { showDetail(i); };
+          seg.onmouseleave = seg.onblur = function() { showDetail(tlSel); };
+          track.appendChild(seg);
+        });
+        tlSel = tlSpans.length - 1;
+        showDetail(tlSel);
+      }
+      tlSpans.forEach(function(sp, i) {
+        track.children[i].style.left = pct(sp.s);
+        track.children[i].style.width = pct(min + (sp.e - sp.s));
+      });
+
+      var extra = wrap.querySelectorAll(".tl-tick, .tl-now");
+      for (var k = 0; k < extra.length; k++) extra[k].remove();
+      for (var y = new Date(min).getUTCFullYear() + 1; Date.UTC(y, 0, 1) < max; y++) {
+        var tick = document.createElement("div");
+        tick.className = "tl-tick";
+        tick.style.left = pct(Date.UTC(y, 0, 1));
+        tick.textContent = y;
+        wrap.appendChild(tick);
+      }
+      var now = document.createElement("div");
+      now.className = "tl-now";
+      now.style.left = pct(icMs);
+      now.textContent = "NOW";
+      wrap.appendChild(now);
+    }
+
     // LIVE CLOCK
 
-    var lastSec = -1;
+    var lastSec = -1, lastMin = -1;
 
     function tick() {
-      var icMsExact = oocToICMs(Date.now());
+      var nowOoc = Date.now();
+      var icMsExact = oocToICMs(nowOoc);
       var icSec = Math.floor(icMsExact / 1000);
       if (icSec !== lastSec) {
         lastSec = icSec;
@@ -813,6 +1149,13 @@
         document.getElementById("clock-dow").innerHTML = buildFlaps(ic.dow, "dow");
         document.getElementById("clock-date").innerHTML = buildFlaps(ic.day + " " + ic.month + " " + ic.year, "date");
         document.getElementById("clock-time").innerHTML = buildTubes(ic.h, ic.m, ic.s);
+        renderRates(nowOoc, icMsExact);
+        var icMin = Math.floor(icSec / 60);
+        if (icMin !== lastMin) {
+          lastMin = icMin;
+          renderWorld(icMsExact);
+          renderTimeline(nowOoc, icMsExact);
+        }
       }
     }
 
@@ -877,19 +1220,6 @@
       el.className = "calc-result" + (err ? " error" : "");
     }
 
-    function renderEpochs() {
-      var tb = document.getElementById("epoch-tbody"); tb.innerHTML = "";
-      for (var i = 0; i < EPOCHS.length; i++) {
-        var e = EPOCHS[i], tr = document.createElement("tr");
-        var od = new Date(e.oocStart);
-        var os = od.getUTCDate() + " " + IC_MONTHS[od.getUTCMonth()].charAt(0) + IC_MONTHS[od.getUTCMonth()].slice(1).toLowerCase() + " " + od.getUTCFullYear();
-        var ip = e.icStart.match(/(\d{4})-(\d{2})-(\d{2})/);
-        var is_ = +ip[3] + " " + IC_MONTHS[+ip[2]-1].charAt(0) + IC_MONTHS[+ip[2]-1].slice(1).toLowerCase() + " " + ip[1];
-        tr.innerHTML = '<td class="epoch-index">'+(i+1)+'</td><td>'+os+'</td><td>'+is_+'</td><td class="mono">'+e.daysPerYear+' d/y</td><td class="mono dim">×'+(365.2425/e.daysPerYear).toFixed(2)+'</td><td class="dim">'+e.label+'</td>';
-        tb.appendChild(tr);
-      }
-    }
-
     (function() {
       function go() {
         tick();
@@ -901,7 +1231,6 @@
         document.getElementById("btn-ooc-to-ic").onclick = calcOtoI;
         document.getElementById("btn-ic-to-ooc").onclick = calcItoO;
         document.getElementById("btn-now").onclick = prefillNow;
-        renderEpochs();
       }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
       else go();
