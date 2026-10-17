@@ -72,7 +72,6 @@
     .tag button:hover { color: var(--red); }
 
     #night { image-rendering: auto; }
-    .sun { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #ffd27a; box-shadow: 0 0 10px 4px rgba(255, 190, 80, 0.45); pointer-events: none; }
 
     /* split flaps */
     .flaps { display: inline-flex; }
@@ -521,6 +520,7 @@
       ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = "#57564f"; ctx.fillRect(0, 0, px, px);
       ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = "#0b0c0b"; ctx.fillRect(0, 0, px, px);
       ctx.globalCompositeOperation = "source-over";
+      if (borders.complete && borders.naturalWidth) { ctx.globalAlpha = 0.32; ctx.drawImage(borders, 0, 0, px, px); ctx.globalAlpha = 1; }
       ctx.strokeStyle = "rgba(239, 230, 207, 0.08)"; ctx.lineWidth = dpr;
       var k = px / MAP;
       for (var lon = -172.5; lon < 180; lon += 15) {
@@ -574,9 +574,6 @@
         }
         ctx.stroke();
       }
-      var sun = toMap(dec / RAD, sunLon);
-      $("sun").style.left = (sun.x / MAP * 100).toFixed(2) + "%";
-      $("sun").style.top = (sun.y / MAP * 100).toFixed(2) + "%";
     }
 
     // Hover: the zone under the cursor lights up and one readout gives its time.
@@ -615,6 +612,10 @@
     var mask = new Image();
     mask.onload = drawMap;
     mask.src = "landmask.png";
+    // borders.png: national borders traced from the Avium Map's political layer (layers/borders.PNG), white on clear
+    var borders = new Image();
+    borders.onload = drawMap;
+    borders.src = "borders.png";
 
     // LIVE CLOCK
     // rAF polls at display rate; the DOM only changes when the IC second does.
@@ -696,7 +697,6 @@
     (function() {
       function go() {
         buildNixies();
-        $("map-box").insertAdjacentHTML("beforeend", '<div id="sun" class="sun"></div>');
         $("city-list").innerHTML = ALL_CITIES.map(function(c) { return '<option value="' + c[0] + ', ' + c[1] + '">'; }).join("");
         $("add-city").addEventListener("change", addPin);
         $("map-box").insertAdjacentHTML("beforeend", '<div id="zone-tip" class="hidden"></div>');
